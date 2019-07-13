@@ -1,0 +1,414 @@
+# -*- coding: utf-8 -*-
+"""
+Chapter1. Language Processing and Python
+"""
+#第一节 Computing with Language: Texts and Words
+#这一部分中,我们将给出一些语言学的程序,但并不会详细讲解它的原理
+#we will take on some linguistically motivated programming tasks without necessarily explaining how they work
+
+##1.1   Getting Started with Python略
+##1.2   Getting Started with NLTK
+import nltk
+#这里选择book安装NLTK教材中使用的数据,当然主要是文本text
+#nltk.download()    #安装之后将其注释,以免再次触发
+
+from nltk.book import *
+print(text1)
+#美国小说家赫尔曼·梅尔维尔的小说《白鲸》
+print(text2)
+#简奥斯丁的《理智与情感》
+
+##1.3   Searching Text 文本搜索
+#使用concordance
+#查看词语出现的上下文
+#concordance:调和，一致；用语索引；著作或作家全集的重要用字索引
+text1.concordance("monstrous")  #adj. 巨大的；怪异的；荒谬的；畸形的
+#The first time you use a concordance on a particular text,
+#it takes a few extra seconds to build an index so that subsequent searches are fast.
+  #其他例子:
+#search Sense and Sensibility for the word affection
+text2.concordance("affection")
+#Search the book of Genesis to find out how long some people lived
+text3.concordance("lived")
+#text3是创世纪,《圣经的第一卷》
+#You could look at text4, the Inaugural Address Corpus(就职演说语料库), 
+#to see examples of English going back to 1789,
+#and search for words like nation, terror, god to see how these words have been used differently over time.
+#text5, the NPS Chat Corpus: search this for unconventional words like im, ur, lol. (Note that this corpus is uncensored!)
+
+#使用similar
+#查看上下文中相似背景下出现的其他词语,并列出num个最相似的词语
+#Distributional similarity: find other words which appear in the
+#same contexts as the specified word; list most similar words first.
+text1.similar("monstrous")
+text2.similar("monstrous")
+#可以看到,奥斯丁和梅尔维尔的小说用词大不相同,在奥斯丁那里，monstrous具有积极的含义(connotation)
+#其中有时她会将其作强调用(intensifier),就像very一样
+
+#common_contexts 许我们研究两个或两个以上的词共同的上下
+#Find contexts where the specified words appear; list most frequent common contexts first.
+text2.common_contexts(["monstrous", "very"])
+
+#使用分布图 dispersion plot 描绘指定词语出现在文本中的位置
+text4.dispersion_plot(["citizens", "democracy", "freedom", "duties", "America"])
+#注:需事先下载Numpy和Matplotlib
+
+#现在轻松一下,让我们尝试以我们刚才看到的不同风格产生一些随机文本
+#text3.generate()
+#The generate() method is not available in NLTK 3.0 but will be reinstated in a subsequent version.
+
+##1.4   Counting Vocabulary 词频统计
+#先查看文本中含有多少个单词
+len(text3)
+#创世纪含有44764个单词和标点符号(punctuation symbols)，或者说标记token
+#标记是指一个字符序列(a sequence of characters),如hairy, his
+#对标记计数即记录该标记在文本中出现过几次
+#查看文章中有多少个不同的标记可以使用集合set(因为集合中不包含重复的元素)
+sorted(set(text3)) #注意这样会显示所有词语和标点
+len(set(text3)) #查看文章由多少个标记组成(不计重复)
+#本文由2789个不同的词构成,或者说词形(word types)
+
+#现在计算文本的词汇丰富度,计算方法为 type的数量/文本长度
+#calculate a measure of the lexical richness of the text
+len(set(text3)) / len(text3)
+#不重复的词仅占6%,或者说平均一个词出现了约16次
+
+#对于单个词语
+text3.count("smote") #v. 打；重击；击败；侵袭（smite的过去式）
+#使用单个词汇的百分比
+100 * text4.count('a') / len(text4)
+#text5.count("lol")
+
+def lexical_diversity(text):
+    return len(set(text)) / len(text)
+def percentage(count, total):
+    return 100 * count / total
+
+
+#第二节 A Closer Look at Python: Texts as Lists of Words
+#本节介绍了一些Python中的元素
+##2.1   Lists 列表
+sent1 = ['Call', 'me', 'Ishmael', '.'] #出自《白鲸》
+len(sent1)
+lexical_diversity(sent1)
+#nltk包预设了sent1至sent9
+sent2
+
+#常用列表操作
+['Monty', 'Python'] + ['and', 'the', 'Holy', 'Grail']
+sent4 + sent1
+
+sent1.append("Some")
+sent1
+
+##2.2   Indexing Lists
+text4[173]
+text4.index('awaken')
+
+text5[16715:16735]
+sent = ['word1', 'word2', 'word3', 'word4', 'word5',
+        'word6', 'word7', 'word8', 'word9', 'word10']
+sent[0]
+sent[9]
+
+#注意选取多个元素时,需要将index设置到对应元素的后一个index
+sent[5:8]
+sent[:3] #从开头到...
+text2[141525:]  #...到结尾
+
+#修改元素
+sent[0] = 'First'
+sent[9] = 'Last'
+sent[1:9] = ['Second', 'Third']
+sent
+
+##2.3   Variables 变量
+#对于variable = expression这样的形式,Python会分析表达式并将值赋予变量,此过程叫做assignment
+my_sent = ['Bravely', 'bold', 'Sir', 'Robin', ',', 'rode',
+           'forth', 'from', 'Camelot', '.']
+noun_phrase = my_sent[1:4]
+wOrDs = sorted(noun_phrase)
+wOrDs
+#注意,大写字母开头的单词会出现在小写的单词之前
+
+##2.4   Strings 字符串
+name = 'Monty'
+name[0]
+name[:4]
+
+#常用字符串操作
+name * 2
+name + '!'
+
+' '.join(['Monty', 'Python'])
+#用开头引号中的内容为分隔符(这里是空格),链接列表中的字符串
+'Monty Python'.split()
+#字符串分割,默认是以空格分割
+
+#第三节 Computing with Language: Simple Statistics
+#In this section we pick up the question of what makes a text distinct,
+#and use automatic methods to find characteristic words and expressions of a text.
+
+ 	
+saying = ['After', 'all', 'is', 'said', 'and', 'done',
+          'more', 'is', 'said', 'than', 'done']
+tokens = set(saying)
+tokens = sorted(tokens)
+tokens[(-2):]
+
+##3.1   Frequency Distributions 词频统计
+#使用nltk包的FreqDist函数对词语进行统计,返回一个FreqDist类的实例
+fdist1 = FreqDist(text1)
+print(fdist1)
+fdist1.most_common(50) #使用频率最高的50个标记
+fdist1['whale'] #查看某个词的出现频率
+fdist1.plot(50, cumulative=True) #50个词的累计分布频数图
+fdist1.hapaxes() #查看只出现了一次的词,hapax legomenon:只用过一次的字句
+
+##3.2   Fine-grained Selection of Words 词语的细粒度选择
+#这一部分将介绍文本中较长的词语(long words),它们具有更多的特征和信息
+#这里我们希望找出文本中长度大于15的词语,我们称之为属性property P
+#即当且仅当w的长度大于15时,P(w)为True
+#用数学表达式表示即为 {w | w ∈ V & P(w)},V表示vocabulary
+#Python中对应的列表解析式为[w for w in V if p(w)]
+V = set(text1)
+long_words = [w for w in V if len(w) > 15]
+sorted(long_words)
+#可以看到text4的长词体现了其national focus,比如constitutionally, transcontinental 
+#text5的长词则体现了其口语化非正式的内容，如boooooooooooglyyyyyy
+
+#为了选取长度较长(以清除the这样的词语)和出现频率较高的词语
+fdist5 = FreqDist(text5)
+sorted(w for w in set(text5) if len(w) > 7 and fdist5[w] > 7)
+
+##3.3   Collocations and Bigrams 词组和二元分词(双连词,把句子从头到尾每两个字组成一个词语)
+#collocation词组是一系列经常出现在一起的词汇
+#比如red wine红酒是一个词组,但wine酒不是
+#词组的特点词组中的单词不能轻易被其他词替换,比如maroon wine(褐红色葡萄酒)听起来就很奇怪
+#先从词对即二元分词开始,可以使用bigrams函数得到
+list(bigrams(['more', 'is', 'said', 'than', 'done']))
+#注意bigrams直接返回的是生成器,所以需要在前面加上list
+#可以看到,than done是一个二元分词,词组本质上是出现频率较高的二元分词,除非我们想关注较少出现的词语
+#特别的,我们想找出比单个词语出现频率更高的二元分词,可以使用collocations函数
+text4.collocations()
+text8.collocations()
+
+##3.4   Counting Other Things
+#例如,我们可以查看词语长度(由多少个字母组成)的分布,同样使用FreqDist
+[len(w) for w in text1]
+fdist = FreqDist(len(w) for w in text1)
+print(fdist)
+fdist
+fdist.most_common()
+fdist.max() #查看出现次数最多的
+fdist.freq(3) #查看对应元素出现频率
+
+###下面是FreqDist函数的一些常见用法###
+"""
+Example	Description
+fdist = FreqDist(samples)	create a frequency distribution containing the given samples
+fdist[sample] += 1	       increment the count for this sample
+fdist['monstrous']	       给定词语样本的频数
+fdist.freq('monstrous')	给定词语的频率
+fdist.keys()               频率递减顺序排序的样本链表
+fdist.N()	                 合计多少标记token,相当于len(text)
+fdist.most_common(n)	   出现最多的前n个词语的出现次数
+for sample in fdist:	   用于循环迭代
+fdist.max()	             出现次数最多的是哪一个
+fdist.tabulate()          tabulate the frequency distribution用表格的形式展示频数
+fdist.plot()	             绘制分布图,可添加参数以确定画前多少个
+fdist.plot(cumulative=True)	绘制累计分布图
+fdist1 |= fdist2          update fdist1 with counts from fdist2
+fdist1 < fdist2	          test if samples in fdist1 occur less frequently than in fdist2
+"""
+##################
+
+#第四节 Back to Python: Making Decisions and Taking Control
+##4.1   Conditionals
+#其中省略部分内容
+###字符串的常用方法###
+#Function	Meaning
+#s.startswith(t)	s是否以t开始
+#s.endswith(t)	test if s ends with t
+#t in s	test if t is a substring of s
+#s.islower()	s是否包含字母且均为小写
+#s.isupper()	s是否包含字母且均为大写
+#s.isalpha()	s是否非空且均为字母,实测都是汉字也是True
+#s.isalnum()	s是否非空且均为字母或数字
+#s.isdigit()	s是否仅由数字构成
+#s.istitle()	字符串中所有的单词拼写首字母是否为大写,且其他字母均为小写 (i.e. all words in s have initial capitals)
+#s.upper()    将s中的字母全部转化为大写
+#s.upper()    将s中的字母全部转化为小写
+############
+#可以使用上面的方法做一些事情,比如#
+sorted(w for w in set(text1) if w.endswith('ableness'))
+sorted(term for term in set(text4) if 'gnt' in term)
+sorted(item for item in set(text6) if item.istitle())
+sorted(w for w in set(text7) if '-' in w and 'index' in w)
+sorted(w for w in set(sent7) if not w.islower()) #包含字母但有大写,或者不包含字母
+
+##4.2   Operating on Every Element
+#比如原先我们清除了重复的单词
+len(text1)
+len(set(text1))
+len(set(word.lower() for word in text1))
+#这里的第三部将大小写影响消除,发现标记token数减少了两千多,说明一些单词由于大写被重复计数
+len(set(word.lower() for word in text1 if word.isalpha())) #清除数字和标点等标记
+
+##4.3   Nested Code Blocks嵌套代码块,主要是指循环等等
+tricky = sorted(w for w in set(text2) if 'cie' in w or 'cei' in w)
+for word in tricky:
+    print(word, end=' ')
+
+
+#第五节 Automatic Natural Language Understanding
+#现在,我们将暂时放下代码,对自然语言处理做基本概述
+#We'll take the opportunity now to step back from the nitty-gritty of code in order to paint a bigger picture of natural language processing.
+#本节将讨论一些语言理解技术(language understanding technologies),让你对目前的挑战有所认识
+##5.1   Word Sense Disambiguation(消除词义的歧义)
+#我们希望理解在给定上下文的情况下,多义词语对应的含义
+#考虑多义词dish和serve
+'''
+serve: help with food or drink; hold an office; put ball into play
+提供，端上食物;任职;发球
+dish: plate; course of a meal; communications device
+碟,盘;一道菜;通信设备
+'''
+#另一个词语by
+'''
+a.		The lost children were found by the searchers (agentive,施事格)
+
+b.		The lost children were found by the mountain (locative,表示位置)
+
+c.		The lost children were found by the afternoon (temporal,表示时间)
+'''
+
+##5.2   Pronoun Resolution代词解析
+#理解比如说who did what to whom这样的句子
+#对于下面三句话
+"""
+a.		The thieves stole the paintings. They were subsequently(随后) sold.
+
+b.		The thieves stole the paintings. They were subsequently caught.
+
+c.		The thieves stole the paintings. They were subsequently found.
+       注意这句话的they指代不明
+"""
+#弄明白介词they的复指(antecedent,下文的词返指或代替上文的词)到底是画还是小偷
+#这类问题被称为anaphora resolution指代消除:识别代词或名词短语提及的是什么
+#和semantic role labeling语义角色标注:识别名词短语和动词的关系(比如动因,受动者,工具等等)
+
+##5.3   Generating Language Output输出
+#比如question answering回答问题和machine translation翻译等问题
+#回答问题
+"""
+a.		Text: ... The thieves stole the paintings. They were subsequently sold. ...
+
+b.		Human: Who or what was sold?
+
+c.		Machine: The paintings.
+"""
+#翻译,需要准确地翻译成原滋原味的对应语言中,比如法语中词有阴性和阳性,需要翻译准确
+"""
+a.		The thieves stole the paintings. They were subsequently found.
+
+b.		Les voleurs ont volé les peintures. Ils ont été trouvés plus tard. (the thieves,阳性)
+
+c.		Les voleurs ont volé les peintures. Elles ont été trouvées plus tard. (the paintings,阴性)
+"""
+
+##5.4   Machine Translation(MT)
+#idiomatic表达方式地道的; 符合(某一)语言习惯的; 包含习语的;
+#目前的翻译系统存在一些严重的缺陷,当你把句子翻译过去再翻译回来,你就可以完全地(starkly)发现其中的问题
+"""
+0> how long before the next flight to Alice Springs?
+   注:澳大利亚城市艾利斯斯普林斯
+1> wie lang vor dem folgenden Flug zu Alice Springs?
+2> how long before the following flight to Alice jump?
+3> wie lang vor dem folgenden Flug zu Alice springen Sie?
+4> how long before the following flight to Alice do you jump?
+5> wie lang, bevor der folgende Flug zu Alice tun, Sie springen?
+6> how long, before the following flight to Alice does, do you jump?
+7> wie lang bevor der folgende Flug zu Alice tut, tun Sie springen?
+8> how long before the following flight to Alice does, do you jump?
+9> wie lang, bevor der folgende Flug zu Alice tut, tun Sie springen?
+10> how long, before the following flight does to Alice, do do you jump?
+11> wie lang bevor der folgende Flug zu Alice tut, Sie tun Sprung?
+12> how long before the following flight does leap to Alice, does you?
+"""
+#可以看到,在从英语到德语的翻译1中城市名被正确翻译,但是在翻译回来时,Springs变成了jump
+#另外介词(preposition)before一开始被翻译为vor,后面又被翻译为bevor
+#当一个词时一个专有词语的一部分,而翻译系统误解了相应的语法时,翻译系统就失效了.
+#机器翻译非常困难,因为一个词可能对应着很多不同的翻译(因为其含义不同),而且由于语法不同,在翻译过程中,词序必然会改变
+#现在我们通过从新闻和政府网站上收集大量的包含两种语言的文本来解决这一问题,
+#给定一份英语和德语的双语文件,和一本字典,我们可以自动匹配这些句子,这个过程叫text alignment(文本对齐),
+#当我们拥有百万乃至更多的句子配对时,我们就能够识别词语和短语,并建立一个用以翻译的模型.
+
+##5.5   Spoken Dialog Systems对话系统
+#Turing Test图灵测试:
+#can a dialogue system, responding to a user's text input, perform so naturally that we cannot distinguish it from a human-generated response?
+#现在的对话系统很鸡肋,不过在某些领域还是能发挥作用
+"""
+S: How may I help you?
+U: When is Saving Private Ryan playing?
+S: For what theater?
+U: The Paramount theater.
+S: Saving Private Ryan is not playing at the Paramount theater, but
+it's playing at the Madison theater at 3:00, 5:30, 8:00, and 10:30.
+"""
+#你不能要求它提供交通工具信息或者附近的餐厅,除非系统以及储存了这些信息,同时包含了相应的问答匹配,
+#你询问电影时,系统认为你想看这部电影,这一推断非常明显,因此你可能不会注意到,一个对话系统应该这种能力才能使得交互更为自然,
+#如果没有这一功能,系统会给出毫无意义的回答:yes
+#商业对话系统的开发者使用文本假设和商业逻辑来确保用户可能的不同表达方式的提问和信息以相同方式被处理,这对于提供有效的服务来说已经足够了.
+#图5.1对话系统流程:
+"""
+Spoken input (top left) is analyzed, words are recognized, 
+sentences are parsed and interpreted in context, 
+application-specific actions take place (top right); a response is planned, 
+realized as a syntactic structure, then to suitably inflected words, and finally to spoken output; 
+different types of linguistic knowledge inform each stage of the process.
+"""
+#To see the available chatbots, run 
+nltk.chat.chatbots()
+
+##5.6   Textual Entailment文本蕴含
+#Recognizing Textual Entailment (RTE)
+#假设你想寻找支持这一假设的证据:Sandra Goudie was defeated by Max Purnell
+#此外有另一段似乎相关的文本:
+"""
+Sandra Goudie was first elected to Parliament in the 2002 elections, 
+narrowly winning the seat of Coromandel by defeating Labour candidate Max Purnell 
+and pushing incumbent Green MP Jeanette Fitzsimons into third place.
+"""
+#这一段文本提供了足够的证据吗?显然没有.你可以轻易得出结论,但是很难给出一个自动的决策方案.
+#RTE的挑战是,并没有足够的数据提供给"brute force"(BF,暴风算法,后文会提及)这些机器学习技术,
+#因此必须要使用一些语义模型.
+#在上述例子中,需要让系统知道是Sandra Goudie这个人被打败了这一假设,而不是他被打败了(重点是打败).
+#另一个示例(illustration)如下:
+"""
+a.		Text: David Golinkin is the editor or author of eighteen books, and over 150 responsa, articles, sermons and books
+
+b.		Hypothesis: Golinkin has written eighteen books
+"""
+#系统必须明白这三件事情:
+"""
+(i) if someone is an author of a book, then he/she has written that book; 作者是写书的
+(ii) if someone is an editor of a book, then he/she has not written (all of) that book;编辑不是是写书的 
+(iii) if someone is editor or author of eighteen books, then one cannot conclude that he/she is author of eighteen books.
+      是18本书的编辑或作者并不代表他写了18本书(这个翻译有点歧义,需要改一改)
+"""
+
+##5.7   Limitations of NLP自然语言处理的局限
+"""
+尽管在RTE等方面的研究取得了很多进展,但在实际应用中,自然语言系统依然不能进行常识性推断,或者广泛且稳定性地运用知识.
+我们可以等待这些复杂的人工智能问题得已解决,但与此同时我们不得不面对当前系统存在的严重问题.
+从一开始,NLP的一个重要目标就是在'理解语言'的一系列难题上取得进展,使用至少看上去有效的技术替代杂乱的知识和推断能力(instead of unrestricted knowledge and reasoning capabilities).
+"""
+
+
+
+
+
+
+
+
